@@ -59,6 +59,10 @@ const reviewRouter = require("./routes/review.model")
 server.use("/api/user/review", AuthMiddleware, reviewRouter)
 
 
+server.get("/", (req, res)=>{
+    res.send("working")
+})
+
 server.listen(PORT, async () => {
     try {
         await connection
