@@ -1,6 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const OrderModel = require('./ordersModel'); // Make sure this path is correct based on your project structure
+const OrderModel = require('../models/order.model'); // Make sure this path is correct based on your project structure
 
 const orderRouter = express.Router();
 

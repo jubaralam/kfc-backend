@@ -1,6 +1,6 @@
 const express = require('express');
 const reviewRouter = express.Router();
-const ReviewModel = require('../models/Review');
+const ReviewModel = require('../models/review.model');
 
 // Create a new review
 reviewRouter.post('/create', async (req, res) => {
