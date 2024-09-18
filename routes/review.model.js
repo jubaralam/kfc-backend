@@ -4,11 +4,12 @@ const ReviewModel = require('../models/review.model');
 
 // Create a new review
 reviewRouter.post('/create', async (req, res) => {
+    const { _id } = req.user
     try {
-        const { user_id, product_id, rating, review } = req.body;
+        const { product_id, rating, review } = req.body;
 
-        const newReview = new ReviewModel({
-            user_id,
+        const newReview = ReviewModel({
+            user_id: _id,
             product_id,
             rating,
             review
@@ -24,7 +25,7 @@ reviewRouter.post('/create', async (req, res) => {
 // Get all reviews for a product
 reviewRouter.get('/get/product/:productId', async (req, res) => {
     try {
-        const reviews = await ReviewModel.find({ product_id: req.params.productId }).populate('user_id product_id');
+        const reviews = await ReviewModel.find({ product_id: req.params.productId })
         res.status(200).json(reviews);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching reviews', error });
@@ -34,7 +35,7 @@ reviewRouter.get('/get/product/:productId', async (req, res) => {
 // Get a specific review by ID
 reviewRouter.get('/get/:id', async (req, res) => {
     try {
-        const review = await ReviewModel.findById(req.params.id).populate('user_id product_id');
+        const review = await ReviewModel.findById(req.params.id)
         if (!review) return res.status(404).json({ message: 'Review not found' });
         res.status(200).json(review);
     } catch (error) {

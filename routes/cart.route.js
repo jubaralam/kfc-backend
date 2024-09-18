@@ -4,10 +4,10 @@ const cartRouter = express.Router()
 const CartModel = require("../models/cart.model")
 
 // get all cart items
-cartRouter.get("/get/:user_id", async (req, res) => {
-    const { user_id } = req.params
+cartRouter.get("/get", async (req, res) => {
+    const { _id } = req.user
     try {
-        const data = await CartModel.find({ user_id })
+        const data = await CartModel.find({ user_id: _id })
         res.status(201).send({ "data": data })
     } catch (error) {
         res.status(403).send({ "error": error.message })
@@ -16,12 +16,13 @@ cartRouter.get("/get/:user_id", async (req, res) => {
 })
 
 // add cart items
-cartRouter.post("/add/:product_id", async (req, res) => {
-    const { user_id, title, quantity } = req.body
-    const { product_id } = req.params
+cartRouter.post("/add", async (req, res) => {
+    const { title, quantity, product_id } = req.body
+    const { _id } = req.user
     try {
+
         const data = CartModel({
-            title, user_id, product_id, quantity
+            title, user_id: _id, product_id, quantity
         })
 
         await data.save()
@@ -39,13 +40,13 @@ cartRouter.post("/add/:product_id", async (req, res) => {
 cartRouter.patch("/update/:product_id", async (req, res) => {
     const { product_id } = req.params;
     const data = req.body;
-    const { user_id } = req.user;
+    const { _id } = req.user;
 
     try {
 
         const updatedCart = await CartModel.findOneAndUpdate(
-            { user_id: user_id, "items.product_id": product_id },
-            { $set: { "items.$.quantity": data.quantity } },
+            { product_id },
+            data,
             { new: true }
         );
 
@@ -63,11 +64,11 @@ cartRouter.patch("/update/:product_id", async (req, res) => {
 // delete/remove cart items from
 cartRouter.delete("/remove/:product_id", async (req, res) => {
     const { product_id } = req.params;
-    const { user_id } = req.user; // Assuming you have user authentication
+    const { _id } = req.user; // Assuming you have user authentication
 
     try {
         const updatedCart = await CartModel.findOneAndUpdate(
-            { user_id: user_id },
+            { user_id: _id },
             { $pull: { items: { product_id: product_id } } },
             { new: true }
         );

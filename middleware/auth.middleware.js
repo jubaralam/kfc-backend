@@ -1,37 +1,11 @@
 
 const UserModel = require("../models/user.model")
 const jwt = require("jsonwebtoken")
-// const ProductMiddleware = async (req, res, next) => {
-//     const token = req.headers.authorization.split(' ')[1];
-
-//     try {
-//         if (!token) {
-//             return res.send({ "message": "token not found" })
-//         }
-//         jwt.verify(token, process.env.secreteKey, async (err, verified) => {
-//             if (err) {
-//                 return res.sendStatus(403)
-//             }
-//             const user = await UserModel.findById({ _id: verified.id })
-//             console.log("middleware data", user)
-//             req.user = user
-
-//             if (["admin", "seller"].includes(user.role)) {
-
-//                 next()
-//             } else {
-//                 res.send({ "message": "you are not authorized" })
-//             }
-//         })
-//     } catch (error) {
-
-//     }
-// }
 
 
 const AuthMiddleware = async (req, res, next) => {
-
     const authHeader = req.headers.authorization;
+    console.log(authHeader)
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return res.status(401).send({ "message": "Token not found or invalid format" });

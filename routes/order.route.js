@@ -6,9 +6,10 @@ const orderRouter = express.Router();
 
 // GET: Fetch all orders
 orderRouter.get('/', async (req, res) => {
+    const { _id } = req.user
     try {
-        const orders = await OrderModel.find().populate('user_id').populate('items.product_id');
-        res.status(200).json(orders);
+        const orders = await OrderModel.find({ user_id: _id })
+        res.status(200).send({ "data": orders });
     } catch (error) {
         res.status(500).json({ message: 'Error fetching orders', error });
     }
@@ -18,9 +19,9 @@ orderRouter.get('/', async (req, res) => {
 orderRouter.post('/add', async (req, res) => {
     try {
         const { user_id, items, total_price, status, payment_status } = req.body;
-
+        const { _id } = req.user
         const newOrder = new OrderModel({
-            user_id,
+            user_id: _id,
             items,
             total_price,
             status,
@@ -28,7 +29,7 @@ orderRouter.post('/add', async (req, res) => {
         });
 
         const savedOrder = await newOrder.save();
-        res.status(201).json(savedOrder);
+        res.status(201).json({ "message": "your order has been placed", savedOrder });
     } catch (error) {
         res.status(500).json({ message: 'Error creating order', error });
     }
@@ -52,6 +53,8 @@ orderRouter.patch('/update/:id', async (req, res) => {
         res.status(500).json({ message: 'Error updating order', error });
     }
 });
+
+
 
 // DELETE: Remove an order
 orderRouter.delete('/remove/:id', async (req, res) => {

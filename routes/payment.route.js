@@ -5,11 +5,11 @@ const PaymentModel = require('../models/payment.model');
 // Create a new payment
 paymentRouter.post('/create', async (req, res) => {
     try {
-        const { order_id, user_id, amount, status, payment_method, transaction_id } = req.body;
-
-        const newPayment = new PaymentModel({
+        const { order_id, amount, status, payment_method, transaction_id } = req.body;
+        const { _id } = req.user
+        const newPayment = PaymentModel({
             order_id,
-            user_id,
+            user_id: _id,
             amount,
             status,
             payment_method,
@@ -21,6 +21,7 @@ paymentRouter.post('/create', async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Error creating payment', error });
     }
+
 });
 
 
@@ -28,13 +29,15 @@ paymentRouter.post('/create', async (req, res) => {
 // Get payment by ID
 paymentRouter.get('/get/:id', async (req, res) => {
     try {
-        const payment = await PaymentModel.findById(req.params.id).populate('order_id user_id');
+        const payment = await PaymentModel.findById({ _id: req.params.id });
         if (!payment) return res.status(404).json({ message: 'Payment not found' });
         res.status(200).json(payment);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching payment', error });
     }
 });
+
+
 
 // Update payment status
 paymentRouter.put('/update/:id', async (req, res) => {

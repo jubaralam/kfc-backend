@@ -1,15 +1,18 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const AddressModel = require('../models/address.model'); 
+const AddressModel = require('../models/address.model');
 const addressRouter = express.Router();
 
 // CREATE: Add a new address
 addressRouter.post('/add', async (req, res) => {
+    const { address_line_1, address_line_2, city, state, postal_code, country } = req.body
+    const { _id } = req.user
     try {
-        const address = new AddressModel(req.body);
+        const address = AddressModel({ user_id: _id, address_line_1, address_line_2, city, state, postal_code, country });
         await address.save();
         res.status(201).json(address);
     } catch (err) {
+
         res.status(400).json({ error: err.message });
     }
 });
@@ -32,9 +35,10 @@ addressRouter.post('/add', async (req, res) => {
 // READ: Get a single address by ID
 
 
-addressRouter.get('/get/:id', async (req, res) => {
+addressRouter.get('/get', async (req, res) => {
+    const { _id } = req.user
     try {
-        const address = await AddressModel.findById(req.params.id);
+        const address = await AddressModel.find({ user_id: _id });
         if (!address) {
             return res.status(404).json({ error: 'Address not found' });
         }
@@ -43,6 +47,9 @@ addressRouter.get('/get/:id', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
+
+
 
 // UPDATE: Update an address by ID
 addressRouter.put('/update/:id', async (req, res) => {
@@ -58,7 +65,7 @@ addressRouter.put('/update/:id', async (req, res) => {
 });
 
 // DELETE: Delete an address by ID
-addressRouter.delete('/remove:id', async (req, res) => {
+addressRouter.delete('/remove/:id', async (req, res) => {
     try {
         const address = await AddressModel.findByIdAndDelete(req.params.id);
         if (!address) {
